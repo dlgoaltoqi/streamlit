@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<script src="/static/js/busca_composicao.js"></script>
+
+<form class="filtros" method="get" action="/comissao">
+  <label>📅 Ano
+    <select name="ano" onchange="this.form.submit()">
+      {% for a in anos %}<option value="{{ a }}" {{ "selected" if a == ano }}>{{ a }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>🗓️ Mês
+    <select name="mes" onchange="this.form.submit()">
+      {% for m, nome in meses %}<option value="{{ m }}" {{ "selected" if m == mes }}>{{ nome }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>👥 Equipe
+    <select name="equipe" onchange="this.form.consultor.value='';this.form.submit()" style="min-width:170px">
+      {% for eq in equipes %}<option value="{{ eq }}" {{ "selected" if eq == equipe }}>{{ eq }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>👤 Consultor
+    <select name="consultor" onchange="this.form.submit()" style="min-width:320px">
+      {% for e in consultores %}<option value="{{ e }}" {{ "selected" if e == consultor }}>{{ e }}</option>{% endfor %}
+    </select>
+  </label>
+  {% if atualizado_em %}
+  <div style="margin-left:auto;align-self:center;">
+    <span style="background:#f3f4f6;color:#4b5563;border-radius:999px;padding:5px 12px;
+                font-size:0.78rem;font-weight:600;white-space:nowrap;">
+      🕒 Atualizado em {{ atualizado_em }}
+    </span>
+  </div>
+  {% endif %}
+</form>
+
+<hr>
+
+<div id="conteudo">
+  <div class="carregando">
+    <div class="barra-progresso"><div id="barra-progresso-fill" class="barra-progresso-fill"></div></div>
+    <div id="carregando-texto">Calculando…<br>
+    As próximas trocas de consultor no mesmo mês são imediatas.</div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var qs = new URLSearchParams(window.location.search);
+    qs.set("ano", "{{ ano }}"); qs.set("mes", "{{ mes }}");
+    qs.set("consultor", "{{ consultor }}");
+
+    function erro(e) {
+      document.getElementById("conteudo").innerHTML =
+        "<div class='aviso-ambar'>Erro ao carregar: " + e + "</div>";
+    }
+
+    function poll(jobId) {
+      fetch("/comissao/progresso/" + jobId)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.status === "error") { erro(data.erro || "falha ao calcular"); return; }
+          if (data.status === "done") {
+            document.getElementById("conteudo").innerHTML = data.html;
+            return;
+          }
+          // A barra não passa de 90%: o total é uma estimativa, não um
+          // número exato (varia por layout AM/GD/B2G/padrão) — só fecha em
+          // 100% quando o job realmente termina.
+          var pct = Math.min(90, Math.round(100 * data.concluidos / Math.max(1, data.total)));
+          var fill = document.getElementById("barra-progresso-fill");
+          if (fill) fill.style.width = pct + "%";
+          var texto = document.getElementById("carregando-texto");
+          if (texto) {
+            texto.innerHTML = "Calculando… " + data.concluidos + " consulta(s) ao Snowflake<br>" +
+              "As próximas trocas de consultor no mesmo mês são imediatas.";
+          }
+          setTimeout(function () { poll(jobId); }, 400);
+        })
+        .catch(function (e) { erro(e); });
+    }
+
+    fetch("/comissao/iniciar?" + qs.toString())
+      .then(function (r) { return r.json(); })
+      .then(function (data) { poll(data.job_id); })
+      .catch(function (e) { erro(e); });
+  })();
+</script>
+{% endblock %}

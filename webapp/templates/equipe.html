@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block conteudo %}
+
+<form class="filtros" method="get" action="/equipe">
+  <label>📅 Ano
+    <select name="ano" onchange="this.form.submit()">
+      {% for a in anos %}<option value="{{ a }}" {{ "selected" if a == ano }}>{{ a }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>🗓️ Mês
+    <select name="mes" onchange="this.form.submit()">
+      {% for m, nome in meses %}<option value="{{ m }}" {{ "selected" if m == mes }}>{{ nome }}</option>{% endfor %}
+    </select>
+  </label>
+  {% if modo == 'admin' %}
+  <label>👤 Líder
+    <select name="lider" onchange="this.form.submit()" style="min-width:320px">
+      {% for g in gestores %}<option value="{{ g }}" {{ "selected" if g == lider }}>{{ g }}</option>{% endfor %}
+    </select>
+  </label>
+  {% else %}
+  <label>👥 Equipe
+    <select name="equipe" onchange="this.form.submit()" style="min-width:200px">
+      {% for eq in equipes %}<option value="{{ eq }}" {{ "selected" if eq == equipe }}>{{ eq }}</option>{% endfor %}
+    </select>
+  </label>
+  {% endif %}
+</form>
+
+<hr>
+
+{% if erro %}
+<div class="aviso-ambar">{{ erro }}</div>
+{% else %}
+{% include "_loader.html" %}
+{% endif %}
+{% endblock %}

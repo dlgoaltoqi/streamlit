@@ -1,0 +1,209 @@
+/* Painel de Comissões — CSS destilado de utils/ui.py (_CSS_GLOBAL/_CSS_BANNER).
+   Fica só o design (paleta, tipografia, cards, banner, controles); todo o
+   combate a seletores do Streamlit morreu na migração. */
+
+:root {
+  color-scheme: light;
+  --azul: #0c5a93;
+  --azul-escuro: #083b8a;
+  --verde: #1ecb78;
+  --fundo: #E8E8E8;
+  --texto: #1a1a1a;
+  --grad: linear-gradient(to right, #083b8a, #0c5a93 40%, #129b92 70%, #1ecb78);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: "Segoe UI", "Source Sans Pro", Arial, sans-serif;
+}
+
+main { padding: 10px; max-width: 1500px; margin: 0 auto; }
+
+/* ── Abas de navegação (era a barra de botões do _app.py) ────────────────── */
+nav.abas {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  margin: 8px 10px 0 10px;
+}
+nav.abas a, nav.abas .aba-admin {
+  text-decoration: none;
+  color: #374151;
+  background: #ffffff;
+  border: 1px solid rgba(128,128,128,0.35);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+nav.abas a:hover { border-color: var(--azul); color: var(--azul); }
+nav.abas a.ativa, nav.abas .aba-admin.ativa {
+  background: var(--grad);
+  color: #ffffff;
+  border: none;
+}
+nav.abas .aba-admin select {
+  border: none; background: transparent; font: inherit; color: inherit;
+  min-width: 0; padding: 0 2px; cursor: pointer;
+}
+nav.abas .aba-admin.ativa select { color: #ffffff; }
+nav.abas .aba-admin.ativa select option { color: #1a1a1a; }
+
+/* ── Banner (era ::before/::after do block-container no SiS) ─────────────── */
+header.banner {
+  position: relative;
+  height: 144px;
+  border-radius: 12px;
+  background: var(--grad);
+  display: flex;
+  align-items: center;
+  margin: 10px 10px 6px 10px;
+}
+header.banner .logo {
+  position: absolute;
+  top: 27px; left: 46px;
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: #ffffff url("/static/img/logo.png") center/70px 70px no-repeat;
+}
+header.banner .titulos {
+  margin-left: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+header.banner h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.9rem;
+  font-weight: 700;
+}
+header.banner .sub { color: #e3f2ec; font-size: 1.05rem; }
+
+/* ── Grid de cards (era st.columns) ──────────────────────────────────────── */
+.row { display: grid; gap: 12px; margin: 8px 0; align-items: start; }
+.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.cols-5 { grid-template-columns: repeat(5, 1fr); }
+.cols-6 { grid-template-columns: repeat(6, 1fr); }
+.cols-7 { grid-template-columns: repeat(7, 1fr); }
+.row.resumo-b2g { grid-template-columns: 1fr 1.4fr 1fr 1fr 1fr 1fr; }
+.row.resumo-padrao { grid-template-columns: 1fr 1.4fr 1fr 1fr 1fr; }
+@media (max-width: 1100px) {
+  .row { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* ── Expander (era st.expander) ──────────────────────────────────────────── */
+details.exp {
+  background: #ffffff;
+  border: 1px solid rgba(128,128,128,0.25);
+  border-radius: 10px;
+  margin: 10px 0;
+  box-shadow: 0 2px 6px rgba(15,23,42,0.08);
+}
+details.exp > summary {
+  cursor: pointer;
+  padding: 10px 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  list-style: none;
+}
+details.exp > summary::before { content: "▸ "; color: var(--azul); }
+details.exp[open] > summary::before { content: "▾ "; }
+details.exp > .exp-body { padding: 4px 14px 14px 14px; overflow-x: auto; }
+
+/* ── Filtros e controles ─────────────────────────────────────────────────── */
+form.filtros { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 2px 0; }
+form.filtros label {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 0.85rem; font-weight: 600; color: #374151;
+}
+select, input[type="text"] {
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid #9ca3af;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  min-width: 130px;
+}
+select:focus, input:focus { outline: 2px solid var(--azul); }
+
+hr { margin: 12px 0; border: none; border-top: 1px solid #9ca3af; }
+
+.titulo-secao { font-size: 1.3rem; font-weight: 700; color: #1a1a1a; margin: 14px 0 8px 0; }
+
+/* ── Avisos ──────────────────────────────────────────────────────────────── */
+.aviso-ambar {
+  color: #1a1a1a; background: #fef3c7; border-radius: 6px;
+  padding: 0.75rem 1rem; border-left: 4px solid #d97706; margin: 0.5rem 0;
+}
+.aviso-azul {
+  color: #1a1a1a; background: #dbeafe; border-radius: 6px;
+  padding: 0.75rem 1rem; border-left: 4px solid #2563eb; margin: 0.5rem 0;
+}
+.caption { color: #6b7280; font-size: 0.88rem; }
+
+/* ── Carregamento (equivalente do st.spinner) ────────────────────────────── */
+.carregando {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 60px 0; color: #374151; text-align: center; font-size: 0.95rem;
+}
+.spinner {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 4px solid #d1d5db; border-top-color: var(--verde);
+  animation: gira 0.9s linear infinite;
+}
+@keyframes gira { to { transform: rotate(360deg); } }
+
+/* ── Barra de progresso (consultas reais, não indeterminada) ─────────────── */
+.barra-progresso {
+  width: 280px; max-width: 80vw; height: 10px; border-radius: 999px;
+  background: #e5e7eb; overflow: hidden;
+}
+.barra-progresso-fill {
+  height: 100%; width: 0%; background: var(--grad);
+  transition: width 0.35s ease-out;
+}
+
+/* ── Scrollbar (paleta AltoQi, como no SiS) ──────────────────────────────── */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--azul); border-radius: 5px; }
+::-webkit-scrollbar-track { background: #d5d5d5; }
+
+/* ── "Visualizar como" (admin real) — na linha das abas ─────────────────── */
+.viewas { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+.viewas form { display: flex; gap: 6px; }
+.viewas input[type="text"] {
+  min-width: 280px; padding: 6px 10px; font-size: 0.88rem;
+}
+.viewas button {
+  background: #6b7280; color: #fff; border: none; border-radius: 6px;
+  padding: 6px 12px; font: inherit; font-size: 0.88rem; cursor: pointer;
+}
+.viewas button:hover { background: var(--azul); }
+.viewas-chip {
+  background: #fef3c7; border-left: 4px solid #d97706; border-radius: 6px;
+  padding: 6px 12px; font-size: 0.85rem; color: #92400e; white-space: nowrap;
+}
+.viewas-erro {
+  background: #fee2e2; border-left: 4px solid #dc2626; border-radius: 6px;
+  padding: 6px 12px; font-size: 0.85rem; color: #991b1b;
+}
+
+/* ── Formulários de edição admin (Fase 5) ────────────────────────────────── */
+form.admin-form { background: #f9fafb; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+form.admin-form input[type="text"] { min-width: 140px; }
+.btn-secundario {
+  background: #ffffff; border: 1px solid #9ca3af; border-radius: 6px;
+  padding: 6px 12px; font: inherit; font-size: 0.88rem; cursor: pointer; color: #374151;
+}
+.btn-secundario:hover { border-color: var(--azul); color: var(--azul); }
+.btn-remover {
+  background: transparent; border: none; cursor: pointer; font-size: 1rem;
+  padding: 2px 6px; border-radius: 4px;
+}
+.btn-remover:hover { background: #fee2e2; }

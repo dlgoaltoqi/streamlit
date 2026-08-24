@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block conteudo %}
+
+<form class="filtros" method="get" action="/pvt">
+  <label>📅 Ano
+    <select name="ano" onchange="this.form.submit()">
+      {% for a in anos %}<option value="{{ a }}" {{ "selected" if a == ano }}>{{ a }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Trimestre
+    <select name="trim" onchange="this.form.submit()">
+      {% for q in ["Q1", "Q2", "Q3", "Q4"] %}<option value="{{ q }}" {{ "selected" if q == trim }}>{{ q }}</option>{% endfor %}
+    </select>
+  </label>
+</form>
+
+<hr>
+
+{% include "_loader.html" %}
+{% endblock %}

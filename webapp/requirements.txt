@@ -1,0 +1,14 @@
+# App web do Painel de Comissões (sem streamlit — asserção do smoke)
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+snowflake-connector-python[pandas]
+pandas
+openpyxl
+cryptography
+# Fase 3+
+authlib
+itsdangerous
+httpx
+python-dotenv

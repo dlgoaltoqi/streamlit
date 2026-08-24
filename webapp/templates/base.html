@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ titulo or "Painel de Comissões" }}</title>
+  <link rel="stylesheet" href="/static/css/painel.css?v={{ CSS_V }}">
+</head>
+<body>
+  <header class="banner">
+    <div class="logo"></div>
+    <div class="titulos">
+      <h1>Painel de Comissões</h1>
+      {% if subtitulo %}<div class="sub">{{ subtitulo }}</div>{% endif %}
+    </div>
+  </header>
+  <nav class="abas">
+    <a href="/comissao" class="{{ 'ativa' if aba == 'mc' }}">💰 Minha Comissão</a>
+    {% if 'me' in tabs %}<a href="/equipe" class="{{ 'ativa' if aba == 'me' }}">👥 Minha Equipe</a>{% endif %}
+    {% if 'pvt' in tabs %}<a href="/pvt" class="{{ 'ativa' if aba == 'pvt' }}">🔬 Comissão PVT</a>{% endif %}
+    {% if 'rd' in tabs %}<a href="/admin/recuperacao-dividas" class="{{ 'ativa' if aba == 'rd' }}">🧾 Recuperação de Dívidas</a>{% endif %}
+    {% if 'adm' in tabs %}
+    <span class="{{ 'ativa' if aba == 'adm' }} aba-admin">⚙️
+      <select onchange="if(this.value)location='/admin/'+this.value">
+        <option value="">Administração…</option>
+        {% for slug, rotulo in admin_paginas %}
+        <option value="{{ slug }}" {{ "selected" if admin_slug == slug }}>{{ rotulo }}</option>
+        {% endfor %}
+      </select>
+    </span>
+    {% endif %}
+    {% if is_real_admin %}
+    <span class="viewas">
+      {% if view_as %}
+      <span class="viewas-chip">⚠️ Visualizando como: <b>{{ view_as }}</b></span>
+      <form method="post" action="/view-as/clear"><button type="submit">✖ Sair</button></form>
+      {% else %}
+      <form method="post" action="/view-as">
+        <input type="text" name="email" placeholder="Visualizar como… email@altoqi.com.br">
+        <button type="submit">→</button>
+      </form>
+      {% endif %}
+    </span>
+    {% endif %}
+  </nav>
+  {% if va_erro %}<div class="viewas-erro" style="margin:8px 10px 0;">⚠️ {{ va_erro }}</div>{% endif %}
+  <main>
+    {% block conteudo %}{% endblock %}
+  </main>
+</body>
+</html>

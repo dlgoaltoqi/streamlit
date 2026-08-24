@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block conteudo %}
+
+<script src="/static/js/admin_grade.js"></script>
+<div class="titulo-secao">{{ rotulo }}</div>
+
+{% if msg %}<div class="aviso-azul">{{ msg }}</div>{% endif %}
+{% if erro_admin %}<div class="aviso-ambar">⚠️ {{ erro_admin }}</div>{% endif %}
+
+{% if mensal or fechamento_equipes is defined %}
+<form class="filtros" method="get" action="/admin/{{ admin_slug }}">
+  <label>📅 Ano
+    <select name="ano" onchange="this.form.submit()">
+      {% for a in anos %}<option value="{{ a }}" {{ "selected" if a == ano }}>{{ a }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>🗓️ Mês
+    <select name="mes" onchange="this.form.submit()">
+      {% for m, nome in meses %}<option value="{{ m }}" {{ "selected" if m == mes }}>{{ nome }}</option>{% endfor %}
+    </select>
+  </label>
+  {% if fechamento_equipes is defined %}
+  <label>👥 Equipe
+    <select name="equipe" onchange="this.form.submit()">
+      {% for eq in fechamento_equipes %}<option value="{{ eq }}" {{ "selected" if eq == fechamento_equipe }}>{{ eq }}</option>{% endfor %}
+    </select>
+  </label>
+  {% endif %}
+</form>
+<hr>
+{% endif %}
+
+{% if fechamento_equipes is defined %}
+<div class="titulo-secao" style="font-size:1.1rem;">Fechar / Reabrir</div>
+{% if fechamento_status %}{{ fechamento_status | safe }}{% else %}
+<div class="caption">Nenhuma equipe disponível para {{ mes }}/{{ ano }}.</div>
+{% endif %}
+{% if job_id %}
+{{ job_html | safe }}
+<script>
+  (function () {
+    var jobId = "{{ job_id }}";
+    function poll() {
+      fetch("/admin/exportar-comissoes/job/" + jobId)
+        .then(function (r) { return r.text(); })
+        .then(function (html) {
+          var alvo = document.getElementById("job-status");
+          if (!alvo) return;
+          alvo.outerHTML = html;
+          var novo = document.getElementById("job-status");
+          if (novo && novo.dataset.status === "running") {
+            setTimeout(poll, 2000);
+          } else {
+            setTimeout(function () { location.reload(); }, 1200);
+          }
+        });
+    }
+    setTimeout(poll, 2000);
+  })();
+</script>
+{% endif %}
+<hr>
+<div class="titulo-secao" style="font-size:1.1rem;">Histórico de Fechamentos</div>
+{% endif %}
+
+{% include "_loader.html" %}
+{% endblock %}

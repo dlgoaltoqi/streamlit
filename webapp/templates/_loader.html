@@ -1,0 +1,15 @@
+<div id="conteudo">
+  <div class="carregando">
+    <div class="spinner"></div>
+    <div>{{ msg_carregando or "Calculando…" }}</div>
+  </div>
+</div>
+<script>
+  fetch("{{ frag_url | safe }}")
+    .then(function (r) { return r.text(); })
+    .then(function (html) { document.getElementById("conteudo").innerHTML = html; })
+    .catch(function (e) {
+      document.getElementById("conteudo").innerHTML =
+        "<div class='aviso-ambar'>Erro ao carregar: " + e + "</div>";
+    });
+</script>
