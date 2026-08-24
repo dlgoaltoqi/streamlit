@@ -1,14 +1,24 @@
 import streamlit as st
+from snowflake.snowpark import Session
 import pandas as pd
 import json as _json
 import datetime as _dt
 
-# --- NOVA LÓGICA DE CONEXÃO PARA A NUVEM ---
+# --- NOVA LÓGICA DE CONEXÃO BLINDADA ---
 def get_active_session():
-    """Cria a sessão usando os Secrets do Streamlit Community Cloud"""
-    conn = st.connection("snowflake")
-    return conn.session()
-
+    """Conecta ao Snowflake forçando a leitura dos Secrets."""
+    try:
+        # Puxa as configurações coladas na aba Secrets do site
+        config = st.secrets["connections"]["snowflake"]
+        return Session.builder.configs(config).create()
+    except KeyError:
+        # Se os Secrets não estiverem lá, trava e avisa na tela da aplicação
+        st.error("🚨 CREDENCIAIS NÃO ENCONTRADAS! Você precisa configurar a aba 'Secrets' no Streamlit Community Cloud com o bloco [connections.snowflake].")
+        st.stop()
+    except Exception as e:
+        # Mostra erro na tela se a senha/usuário/chave estiverem incorretos
+        st.error(f"🚨 Erro ao conectar no Snowflake: {e}")
+        st.stop()
 
 def get_session():
     return get_active_session()
