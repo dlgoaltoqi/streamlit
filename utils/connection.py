@@ -4,25 +4,55 @@ import pandas as pd
 import json as _json
 import datetime as _dt
 
-# --- NOVA LÓGICA DE CONEXÃO BLINDADA ---
-def get_active_session():
-    """Conecta ao Snowflake forçando a leitura dos Secrets."""
+# --- NOVOS IMPORTS PARA TRATAR A CHAVE RSA ---
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
+
+def get_session():
+    """Força a conexão direta via Snowpark e converte a chave RSA."""
     try:
-        # Puxa as configurações coladas na aba Secrets do site
-        config = st.secrets["connections"]["snowflake"]
+        # Copia os secrets para um dicionário modificável
+        config = dict(st.secrets["connections"]["snowflake"])
+        
+        # Se houver uma chave privada configurada, converte de Texto (PEM) para Bytes (DER)
+        if "private_key" in config:
+            p_key_str = config["private_key"]
+            passphrase = config.get("private_key_passphrase")
+            
+            if passphrase:
+                passphrase = passphrase.encode()
+            
+            # Lê a chave em formato de texto
+            p_key = serialization.load_pem_private_key(
+                p_key_str.encode(),
+                password=passphrase,
+                backend=default_backend()
+            )
+            
+            # Converte para bytes exigidos pelo Snowflake
+            der_key = p_key.private_bytes(
+                encoding=serialization.Encoding.DER,
+                format=serialization.PrivateFormat.PKCS8,
+                encryption_algorithm=serialization.NoEncryption()
+            )
+            
+            # Substitui o texto pelos bytes na configuração
+            config["private_key"] = der_key
+        
         return Session.builder.configs(config).create()
+    
     except KeyError:
-        # Se os Secrets não estiverem lá, trava e avisa na tela da aplicação
-        st.error("🚨 CREDENCIAIS NÃO ENCONTRADAS! Você precisa configurar a aba 'Secrets' no Streamlit Community Cloud com o bloco [connections.snowflake].")
+        st.error("🚨 CREDENCIAIS NÃO ENCONTRADAS! Verifique a aba Secrets.")
+        st.stop()
+    except ValueError as ve:
+        st.error(f"🚨 Erro na Chave RSA (Senha incorreta ou formato inválido nos Secrets): {ve}")
         st.stop()
     except Exception as e:
-        # Mostra erro na tela se a senha/usuário/chave estiverem incorretos
         st.error(f"🚨 Erro ao conectar no Snowflake: {e}")
         st.stop()
 
-def get_session():
-    return get_active_session()
-
+def get_active_session():
+    return get_session()
 
 def compat_rerun():
     """st.rerun() foi adicionado no Streamlit 1.27; SiS usa versão anterior."""
