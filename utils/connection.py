@@ -1,8 +1,13 @@
-from snowflake.snowpark.context import get_active_session
 import streamlit as st
 import pandas as pd
 import json as _json
 import datetime as _dt
+
+# --- NOVA LÓGICA DE CONEXÃO PARA A NUVEM ---
+def get_active_session():
+    """Cria a sessão usando os Secrets do Streamlit Community Cloud"""
+    conn = st.connection("snowflake")
+    return conn.session()
 
 
 def get_session():
@@ -345,7 +350,7 @@ _MESES_ABREV = {
 MESES_ABREV = _MESES_ABREV
 MESES_NOME = {
     1: "Janeiro", 2: "Fevereiro", 3: "Março",    4: "Abril",
-    5: "Maio",    6: "Junho",     7: "Julho",     8: "Agosto",
+    5: "Maio",    6: "Junho",     7: "Julho",    8: "Agosto",
     9: "Setembro",10: "Outubro",  11: "Novembro", 12: "Dezembro",
 }
 
